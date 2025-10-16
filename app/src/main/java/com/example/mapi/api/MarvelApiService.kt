@@ -12,7 +12,7 @@ interface MarvelApiService {
         @Query("ts") ts: String,
         @Query("apikey") apiKey: String,
         @Query("hash") hash: String,
-        @Query("limit") limit: Int = 20,
+        @Query("limit") limit: Int = 30,
         @Query("offset") offset: Int = 0
     ): Call<MarvelResponse>
 }

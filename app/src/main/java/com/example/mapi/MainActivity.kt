@@ -1,5 +1,6 @@
 package com.example.mapi
 
+import android.R.attr.description
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -12,18 +13,23 @@ import com.example.mapi.util.md5
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.example.mapi.CharacterAdapter
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var imageCharacter: ImageView
     private lateinit var textName: TextView
-    private lateinit var buttonNext: Button
+    private lateinit var description: TextView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: CharacterAdapter
+    private val allCharacters = mutableListOf<Character>()
 
     private val publicKey = "94a61916b23289f524333a22bfd752e0"
     private val privateKey = "eaee7179d349176214307019a4cc0a42ef93d6e6"
@@ -35,20 +41,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        imageCharacter = findViewById(R.id.imageCharacter)
-        textName = findViewById(R.id.textName)
-        buttonNext = findViewById(R.id.buttonNext)
+        recyclerView = findViewById(R.id.recyclerCharacters)
+        adapter = CharacterAdapter(allCharacters)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
 
         loadCharacters()
-
-        buttonNext.setOnClickListener {
-            if (characters.isNotEmpty()) {
-                index = (index + 1) % characters.size
-                displayCharacter(characters[index])
-            } else {
-                loadCharacters()
-            }
-        }
     }
 
     private fun loadCharacters() {
@@ -61,11 +59,12 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         val api = retrofit.create(MarvelApiService::class.java)
-        api.getCharacters(ts, publicKey, hash, 10, offset).enqueue(object : Callback<MarvelResponse> {
+        api.getCharacters(ts, publicKey, hash, 20, offset).enqueue(object : Callback<MarvelResponse> {
             override fun onResponse(call: Call<MarvelResponse>, response: Response<MarvelResponse>) {
                 if (response.isSuccessful) {
-                    characters = response.body()?.data?.results ?: emptyList()
-                    if (characters.isNotEmpty()) displayCharacter(characters[0])
+                    val newCharacters = response.body()?.data?.results ?: emptyList()
+                    allCharacters.addAll(newCharacters)
+                    adapter.addCharacters(newCharacters)
                 }
             }
 
@@ -75,21 +74,5 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun displayCharacter(character: Character) {
-        textName.text = character.name
-
-        // Construct the image URL correctly
-        val imageUrl = "${character.thumbnail.path}.${character.thumbnail.extension}"
-
-        // Marvel sometimes returns http instead of https — fix that
-        val secureUrl = imageUrl.replace("http://", "https://")
-
-        // Load it with Picasso
-        Picasso.get()
-            .load(secureUrl)
-            .placeholder(R.drawable.ic_launcher_background) // optional placeholder
-            .error(R.drawable.ic_launcher_foreground)       // optional fallback
-            .into(imageCharacter)
-    }
 
 }
