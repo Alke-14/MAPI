@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="8dp"
-    android:background="@android:color/white">
+    android:background="#262626">
 
     <ImageView
         android:id="@+id/imageCharacter"
@@ -23,19 +23,21 @@
             android:id="@+id/textName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
+            android:layout_marginBottom="4dp"
+            android:textColor="@android:color/white"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
-            android:layout_marginBottom="4dp" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
+            android:textAppearance="@style/TextAppearance.description"
+            android:ellipsize="end"
+            android:fontFamily="@font/red_hat_display_medium"
             android:maxLines="4"
-            android:ellipsize="end" />
+
+            android:textSize="14sp" />
 
     </LinearLayout>
 </LinearLayout>
